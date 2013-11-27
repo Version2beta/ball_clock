@@ -1,7 +1,18 @@
 # A programming problem
 Solved by Rob Martin, 27 November 2013
 
-## The problem as described:
+## In short
+
+-> cat inputs.txt
+30
+45
+0
+
+-> cat inputs.txt | go run main.go
+30 balls cycle after 15 days.
+45 balls cycle after 378 days.
+
+## The problem as described
 
 ### CLOCK
 

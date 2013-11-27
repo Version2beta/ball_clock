@@ -56,7 +56,7 @@ Output for the Sample Input
 
 Given that the input data represents the number of balls in the queue at the start of operation (i.e. none of the balls given in the input data are in operation) and the additional instructions exclude mathematical optimizations, it seems the most interesting way of solving the problem set is to simulate the clock in code.
 
-Golang is a concurrent programming language suggesting that the problem may be solved in parallel. However, the movement of the balls through the clock are inherently linear, so sequential operation best models the clock. This is an O(n) solution and the execution time will correlate to the number of days before the queue returns to its original order.
+Golang is a concurrent programming language suggesting that the problem may be solved in parallel. However, the movement of the balls through the clock are inherently linear, so sequential operation best models the clock. Execution time will correlate to the number of days before the queue returns to its original order.
 
 ### Algorithm
 

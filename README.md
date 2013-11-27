@@ -1,6 +1,5 @@
 # A programming problem
-Issued by Doug Tolton
-Solved by Rob Martin, 26 November 2013
+Solved by Rob Martin, 27 November 2013
 
 ## The problem as described:
 
@@ -59,5 +58,3 @@ The main loop represents a one minute tick and operates as follows:
 0. If the five minute track returns an array, the head is moved to the hour track, and the tail is appended to the queue.
 0. If the hour track returns an array, the tail is appended to the queue, then the head is appended to the queue and a half-day counter is incremented.
 0. If the queue is in its original order, the loop is stopped and the required output is generated.
-
-

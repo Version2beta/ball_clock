@@ -4,14 +4,15 @@ import "os"
 import "bufio"
 import "strings"
 import "strconv"
+import "reflect"
 import "fmt"
 
 //
 // Utility functions because I don't know where to find these elsewhere
 //
 
+// Splits a slice into [head | tail]
 func shift(queue []int) (int, []int) {
-	// Splits a slice into [head | tail]
 	switch len(queue) {
 	case 0:
 		return -1, []int{}
@@ -21,31 +22,18 @@ func shift(queue []int) (int, []int) {
 	return queue[0], queue[1:]
 }
 
+// Prepend an element to a slice and return it
 func unshift(ball int, queue []int) []int {
-	// Prepend an element to a slice and return it
 	queue = append([]int{ball}, queue...)
 	return queue
-}
-
-func equal(a []int, b []int) bool {
-	// Test if two int slices contain the same values in the same order
-	if len(a) != len(b) {
-		return false
-	}
-	for i, v := range a {
-		if v != b[i] {
-			return false
-		}
-	}
-	return true
 }
 
 //
 // Functions that model the operation of a ball clock
 //
 
+// Return a queue slice initialized with `depth` balls
 func makeQueue(depth int) []int {
-	// Return a queue slice initialized with `depth` balls
 	queue := []int{}
 	for i := 0; i < depth; i++ {
 		queue = append(queue, i)
@@ -53,8 +41,8 @@ func makeQueue(depth int) []int {
 	return queue
 }
 
+// Add a ball to a "track" slice, and return both the track and any balls that should fall off
 func passBallToTrack(ball int, track []int, depth int) (int, []int, []int) {
-	// Add a ball to a "track" slice, and return both the track and any balls that should fall off
 	track = unshift(ball, track)
 	returning := []int{}
 	if len(track) == depth {
@@ -65,8 +53,8 @@ func passBallToTrack(ball int, track []int, depth int) (int, []int, []int) {
 	return ball, returning, track
 }
 
+// Set up and then run a ball clock until the queue returns to its original state, then return the whole number of days it took
 func masterLoop(balls int) int {
-	// Set up and then run a ball clock until the queue returns to its original state, then return the whole number of days it took
 	var queue, oneMinuteTrack, fiveMinuteTrack, oneHourTrack, returned []int
 	var ball, halfDays int
 	queue = makeQueue(balls)
@@ -89,11 +77,11 @@ func masterLoop(balls int) int {
 		returned = append(returned, ball)
 		queue = append(queue, returned...)
 		halfDays++
-		if equal(queue, makeQueue(balls)) {
+		if reflect.DeepEqual(queue, makeQueue(balls)) {
 			break
 		}
 	}
-	return int(halfDays / 2)
+	return halfDays / 2
 }
 
 //
@@ -102,12 +90,9 @@ func masterLoop(balls int) int {
 // Output according to the required format
 
 func main() {
-	reader := bufio.NewReader(os.Stdin)
-	for {
-		line, err := reader.ReadString('\n')
-		if err != nil {
-			continue
-		}
+	scanner := bufio.NewScanner(os.Stdin)
+	for scanner.Scan() {
+		line := scanner.Text()
 		balls, err := strconv.Atoi(strings.TrimRight(line, "\n"))
 		if balls == 0 && err == nil {
 			// exit on zero input, other cases are not defined
@@ -116,5 +101,8 @@ func main() {
 		if balls >= 27 && balls <= 127 {
 			fmt.Println(balls, "balls cycle after", masterLoop(balls), "days.")
 		}
+	}
+	if err := scanner.Err(); err != nil {
+		fmt.Fprintln(os.Stderr, "reading standard input:", err)
 	}
 }

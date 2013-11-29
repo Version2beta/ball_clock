@@ -53,31 +53,55 @@ func passBallToTrack(ball int, track []int, depth int) (int, []int, []int) {
 	return ball, returning, track
 }
 
-// Set up and then run a ball clock until the queue returns to its original state, then return the whole number of days it took
-func masterLoop(balls int) int {
+// Set up and then run a ball clock for twelve hours to figure out the ball pattern
+// This pattern will repeat every twelve hours, so we only have to run it once.
+func getTwelveHourTransform(balls int) []int {
 	var queue, oneMinuteTrack, fiveMinuteTrack, oneHourTrack, returned []int
-	var ball, halfDays int
+	var ball int
 	queue = makeQueue(balls)
 	for {
 		ball, queue = shift(queue)
 		ball, returned, oneMinuteTrack = passBallToTrack(ball, oneMinuteTrack, 5)
-		if ball < 0 {
-			continue
-		}
-		queue = append(queue, returned...)
-		ball, returned, fiveMinuteTrack = passBallToTrack(ball, fiveMinuteTrack, 12)
-		if ball < 0 {
-			continue
-		}
-		queue = append(queue, returned...)
-		ball, returned, oneHourTrack = passBallToTrack(ball, oneHourTrack, 12)
-		if ball < 0 {
-			continue
-		}
-		returned = append(returned, ball)
-		queue = append(queue, returned...)
+		if ball >= 0 {
+			// minuteTrack returned ball for fiveMinuteTrack
+			queue = append(queue, returned...)
+			ball, returned, fiveMinuteTrack = passBallToTrack(ball, fiveMinuteTrack, 12)
+			if ball >= 0 {
+				// fiveMinuteTrack returned ball for oneHourTrack
+				queue = append(queue, returned...)
+				ball, returned, oneHourTrack = passBallToTrack(ball, oneHourTrack, 12)
+				if ball >= 0 {
+					// oneHourTrack returned ball - twelve hours have passed
+					returned = append(returned, ball)
+					queue = append(queue, returned...)
+					break
+				} // oneHourTrack
+			} // fiveMinuteTrack
+		} // oneMinuteTrack
+	}
+	return queue
+}
+
+// Transform the queue using the twelve hour pattern provided
+func transformQueue(queue, pattern []int) []int {
+	var transformedQueue []int
+	for _, v := range pattern {
+		transformedQueue = append(transformedQueue, queue[v])
+	}
+	return transformedQueue
+}
+
+// Use the twelve hour pattern to transform the queue repeatedly until it returns to the original pattern
+func mainLoop(balls int) int {
+	var halfDays int
+	var queue, originalQueue, transformPattern []int
+	queue, originalQueue = makeQueue(balls), makeQueue(balls)
+	transformPattern = getTwelveHourTransform(balls)
+	for {
+		// Count the days until the queue returns to its original pattern
 		halfDays++
-		if reflect.DeepEqual(queue, makeQueue(balls)) {
+		queue = transformQueue(queue, transformPattern)
+		if reflect.DeepEqual(queue, originalQueue) {
 			break
 		}
 	}
@@ -99,10 +123,7 @@ func main() {
 			return
 		}
 		if balls >= 27 && balls <= 127 {
-			fmt.Println(balls, "balls cycle after", masterLoop(balls), "days.")
+			fmt.Println(balls, "balls cycle after", mainLoop(balls), "days.")
 		}
-	}
-	if err := scanner.Err(); err != nil {
-		fmt.Fprintln(os.Stderr, "reading standard input:", err)
 	}
 }

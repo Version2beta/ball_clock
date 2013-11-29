@@ -71,3 +71,7 @@ The main loop represents a one minute tick and operates as follows:
 0. If the five minute track returns an array, the head is moved to the hour track, and the tail is appended to the queue.
 0. If the hour track returns an array, the tail is appended to the queue, then the head is appended to the queue and a half-day counter is incremented.
 0. If the queue is in its original order, the loop is stopped and the required output is generated.
+
+### Optimized solution
+
+For any given number of balls (at least within the range given in this problem), the queue follows the same transformation pattern every twelve hours. The low hanging optimization fruit is to find the queue transformation pattern by running the first twelve hours once and then skip the 720 passes through that loop every twelve hours after that by running a transform on the queue instead.
